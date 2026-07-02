@@ -44,6 +44,8 @@ PHASE_A = SCRIPT_DIR / 'phase_a.py'
 PHASE_B = SCRIPT_DIR / 'download.py'
 PHASE_C = SCRIPT_DIR / 'phase_c.py'
 
+# Institution-specific — edit for a different Canvas host. See README
+# "Read first: this was built for one specific setup".
 CANVAS_BASE = 'https://usfca.instructure.com'
 
 
@@ -75,6 +77,8 @@ def slugify(name: str) -> str:
 
 
 def get_token() -> str:
+    # The env var works on any OS — set CANVAS_API_TOKEN to skip the macOS
+    # Keychain path entirely (e.g. on Linux/Windows).
     token = os.environ.get('CANVAS_API_TOKEN')
     if token:
         return token

@@ -36,6 +36,8 @@ from dataclasses import dataclass, field
 from pathlib import Path
 from typing import Any
 
+# Institution-specific — edit for a different Canvas host. See README
+# "Read first: this was built for one specific setup".
 CANVAS_BASE = 'https://usfca.instructure.com'
 
 SAFE_FS = re.compile(r'[^\w\-. ]+')

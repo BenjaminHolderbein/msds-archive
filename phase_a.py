@@ -28,6 +28,9 @@ from pathlib import Path
 SCRIPT_DIR = Path(__file__).parent
 EXTRACT_JS = SCRIPT_DIR / 'extract_manifest.js'
 
+# Institution-specific — edit for a different school. See README
+# "Read first: this was built for one specific setup". The Panopto LTI tool ID
+# is per-institution; find yours in a /courses/<id>/external_tools/<ID> URL.
 CANVAS_BASE = 'https://usfca.instructure.com'
 PANOPTO_LTI_TOOL_ID = '119349'  # USF's global Panopto LTI; same across all courses
 

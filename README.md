@@ -14,6 +14,37 @@ Output: a local mirror that future tools can transcribe, embed, and query.
 > excluded and re-run once its term ends — see `HDD_SETUP.md` → Scope.)
 > Details in `HDD_SETUP.md` → Run history; ghost list in `_ghost_sessions.md`.
 
+## Read first: this was built for one specific setup
+
+This repo is a **working reference implementation, not a turnkey product.** It
+was written and run once, end to end, against one very particular environment:
+a USF student's macOS laptop, a `cmux` browser, and a 2 TB USB drive. It worked
+— but almost every one of those choices is incidental. Your setup will differ,
+and the code makes no attempt to auto-detect that. **Expect to adapt it.**
+
+The table below is a map of every place the author's context leaked into the
+project, so you (or a coding agent you point at this repo) can find and change
+what matters *for your* situation — and, just as importantly, know what you can
+leave alone.
+
+| Assumption baked in here | What it actually is | Change it if… | Where |
+|---|---|---|---|
+| **School = USF** | `CANVAS_BASE = 'https://usfca.instructure.com'` and Panopto LTI `PANOPTO_LTI_TOOL_ID = '119349'` are **hardcoded** | you're at a different school (different Canvas host; the Panopto tool ID is per-institution — find yours in a `/courses/<id>/external_tools/<ID>` launch URL) | top of `phase_a.py`, `phase_c.py`, `archive.py` |
+| **Secret in macOS Keychain** | token read via `security find-generic-password -s canvas-api-token` | you're on Linux/Windows, or store secrets elsewhere — note the code already falls back to the `CANVAS_API_TOKEN` **env var**, which works everywhere | `get_token()` in the three scripts; see [Canvas auth](#canvas-auth) |
+| **macOS host** | `caffeinate`, `diskutil`, `security`, `/Volumes/...` mount paths | you're not on macOS — swap or drop these (they're used for keep-awake, drive checks, and Keychain; none are load-bearing to the archive itself) | `archive.py`, `test_setup.py`, `HDD_SETUP.md` |
+| **Browser = cmux** | Phase A drives a `cmux` browser surface to extract Panopto manifests | you use plain Chrome, the Claude Chrome extension, Playwright, etc. — only Phase A cares | [Adapting the browser driver](#adapting-the-browser-driver-cmux-chrome-or-manual) |
+| **Harness = Claude Code + cmux panes** | `HDD_SETUP.md` is written *to a Claude Code agent*, and the overnight-run recipe uses `cmux new-pane` / `cmux send` | you drive it by hand, or with a different agent/terminal — the pane orchestration is just one way to keep a long run alive; a plain foreground `caffeinate python3 archive.py …` in any terminal is equivalent | `HDD_SETUP.md` → run recipes |
+| **Storage = 2 TB external HDD** | *not hardcoded* — `--output <path>` is a required flag. The HDD is only an **example** throughout the docs | you archive to an internal disk, NAS, etc. — just pass a different `--output`; nothing to edit | `--output` flag |
+| **`--mode audio+screen`** | default tuned for a *downstream-AI* archive (drop cam video, keep screen + audio for ASR/OCR) | you want watchable video → `--mode podcast`; everything → `--mode all` | [Per-session modes](#per-session-modes) |
+
+**If you're pointing a coding agent at this:** treat the rows above as *the*
+list of context to reconcile with the user's actual environment before running
+anything — but don't over-engineer it into a config framework. The author left
+these hardcoded on purpose; the goal is a clean one-time adaptation for *your*
+context, not a general-purpose tool. When a choice depends on the user's setup
+(their school, OS, drive, browser), **ask them** rather than guessing. Start
+with `test_setup.py`, which surfaces most mismatches in ~15 s.
+
 ## Requirements
 
 - **macOS** (uses the Keychain via `security`, and the cmux browser for Phase A).
