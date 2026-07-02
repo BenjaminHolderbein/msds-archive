@@ -1,5 +1,13 @@
 # HDD setup runbook
 
+> **Note — this runbook assumes the cmux reference setup** (a `cmux` browser
+> surface for Phase A, an external HDD at `/Volumes/ColdStore`). cmux is **not**
+> a hard requirement: only Phase A drives a browser, and it can run on Chrome
+> (incl. the Claude Chrome extension), a Playwright/Puppeteer/Selenium driver,
+> or manual DevTools extraction instead. If you're not on cmux, read
+> [README → *Adapting the browser driver*](README.md#adapting-the-browser-driver-cmux-chrome-or-manual)
+> first, then treat the cmux-specific steps below as the pattern to translate.
+
 **Audience:** a Claude Code session opened in `msds-archive/` after the user
 plugs in a freshly-arrived 2 TB external HDD. Goal: validate the drive,
 format it, format-test it, then start the archive run.
