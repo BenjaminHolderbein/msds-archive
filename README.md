@@ -10,9 +10,9 @@ Output: a local mirror that future tools can transcribe, embed, and query.
 > MSDS-program courses, **389 Panopto lectures** as `combined.mp4` (video+audio,
 > after removing 30 canceled/empty "ghost" recordings) + captions, 519 Canvas
 > files + 164 submissions, at `/Volumes/ColdStore/msds-archive/`. (7 Canvas files
-> were HTTP 404 / deleted upstream; MSDS 631 / current-term Generative AI
-> excluded, to add later.) Details in `HDD_SETUP.md` → Run history; ghost list
-> in `_ghost_sessions.md`.
+> were HTTP 404 / deleted upstream; any still-in-progress course is best
+> excluded and re-run once its term ends — see `HDD_SETUP.md` → Scope.)
+> Details in `HDD_SETUP.md` → Run history; ghost list in `_ghost_sessions.md`.
 
 ## Requirements
 
