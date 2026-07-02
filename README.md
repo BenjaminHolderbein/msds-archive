@@ -18,8 +18,10 @@ Output: a local mirror that future tools can transcribe, embed, and query.
 
 - **macOS** (uses the Keychain via `security`, and the cmux browser for Phase A).
 - **Python 3.9+** — standard library only, no `pip install` needed.
-- **CLI tools on `PATH`:** `curl`, `ffmpeg` (for muxing), and
-  [`cmux`](https://cmux.app) with a browser surface logged into Canvas.
+- **CLI tools on `PATH`:** `curl` and `ffmpeg` (for muxing). Phase A also needs
+  a browser that can run JS in an authenticated Canvas/Panopto session — the
+  reference setup uses [`cmux`](https://cmux.app), but that's **not a hard
+  requirement**; see [Adapting the browser driver](#adapting-the-browser-driver-cmux-chrome-or-manual).
 - A **Canvas API token** stored in the macOS Keychain (see [Canvas auth](#canvas-auth)).
 - Somewhere to put ~50 GB–2 TB depending on `--mode` (an external HDD in the
   original run).
@@ -223,6 +225,46 @@ cmux tree --all | grep -E "surface.*browser.*(instructure\.com|panopto\.com)"
 
 The ref looks like `surface:1` or `surface:13`. Pass it to `phase_a.py` as
 `--surface surface:N`.
+
+## Adapting the browser driver (cmux, Chrome, or manual)
+
+**Only Phase A touches a browser at all.** Phase B is plain `curl` against
+CloudFront and Phase C is the Canvas REST API with your token — neither knows
+what cmux is. So "de-cmux-ing" this project means replacing exactly one thin
+shim in `phase_a.py`. That file talks to the browser through four small
+primitives, all near the top:
+
+| Primitive | What it must do |
+|---|---|
+| `browser_eval(surface, js)` | Run `js` in the authenticated page, return its (JSON-stringified) result. **The only one that matters** — everything else is convenience. |
+| `cmux(surface, 'navigate', url)` | Point the tab at `url`. |
+| `cmux(surface, 'wait', '--load-state', 'complete', …)` | Block until the page finishes loading. |
+| `find_canvas_surface()` | Locate/return a tab already logged into Canvas or Panopto. |
+
+Point those four at any driver that can evaluate JS inside a browser session
+that's already signed into your school's Canvas + Panopto SSO. Options, roughly
+in order of effort:
+
+- **Claude's Chrome extension / "Claude in Chrome."** A natural fit: it exposes
+  a `navigate` and a JavaScript-evaluation tool (`javascript_tool`) against your
+  real logged-in Chrome tab — a near drop-in for `navigate` + `browser_eval`.
+  You can either rewrite the four primitives to call those MCP tools, or just
+  hand `extract_manifest.js` (plus the per-course launch steps below) to Claude
+  and let it drive the extraction interactively.
+- **A CDP driver — Playwright / Puppeteer / Selenium.** Launch (or attach to)
+  Chrome with your normal profile so the Canvas/Panopto cookies are present,
+  then map `browser_eval` → `page.evaluate()` and `navigate` → `page.goto()`.
+  Headed is fine; SSO/2FA is a one-time manual login in that profile.
+- **Fully manual (no driver).** Open the course's Panopto folder in a normal
+  browser, paste the body of `extract_manifest.js` into DevTools → Console, and
+  save the printed JSON as `manifests/<course-slug>.json`. Tedious across 20
+  courses but requires zero tooling, and Phases B/C then run untouched.
+
+**Chrome vs. cmux caveat:** several "Hard-won facts" above are WKWebView-specific
+(cmux's engine). In real Chrome the LTI-iframe third-party-cookie failure (fact
+#2) and the `about:blank` hang (fact #3) may not occur — but the fix for #2
+(`form.target = "_top"; form.submit()`) is harmless if applied anyway, and it's
+the mechanism `launch_panopto()` already uses, so leave it in.
 
 ## Running an individual phase
 
