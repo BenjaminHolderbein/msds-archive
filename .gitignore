@@ -1,0 +1,30 @@
+# --- Archived course data (never publish) ---
+# Real Canvas content, Panopto manifests, and downloaded lecture media are
+# personal / copyrighted coursework. The pipeline regenerates all of this.
+content/
+manifests/
+_smoketest/
+msds-634-deep-learning.json
+
+# Pipeline run artifacts
+_state.json
+_archive_report.*
+_archive_run.log
+INDEX.md
+_ghost_sessions.md
+*.mp4
+*.m4a
+*.srt
+
+# Third-party userscript (see README "Prior art") — not vendored here
+Panopto-Video-DL-*.user.js
+
+# Python
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+.env
+
+# macOS
+.DS_Store
