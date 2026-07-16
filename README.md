@@ -6,13 +6,14 @@ about each course (assignments, pages, modules, syllabus, announcements,
 discussions, files, my submitted work, instructor feedback / rubric scores).
 Output: a local mirror that future tools can transcribe, embed, and query.
 
-> **Status:** Complete (run 2026-06-05, post-processed 2026-06-06) — 19
-> MSDS-program courses, **389 Panopto lectures** as `combined.mp4` (video+audio,
-> after removing 30 canceled/empty "ghost" recordings) + captions, 519 Canvas
-> files + 164 submissions, at `/Volumes/ColdStore/msds-archive/`. (7 Canvas files
-> were HTTP 404 / deleted upstream; any still-in-progress course is best
-> excluded and re-run once its term ends — see `HDD_SETUP.md` → Scope.)
-> Details in `HDD_SETUP.md` → Run history; ghost list in `_ghost_sessions.md`.
+> **Status:** Complete (runs 2026-06-05 and 2026-07-15) — 20 MSDS-program
+> courses, **406 Panopto lectures** as `combined.mp4` (video+audio, after
+> removing 32 canceled/empty "ghost" recordings) + captions, 531 Canvas
+> files + 178 submissions, ~570 GB at `/Volumes/ColdStore/msds-archive/`.
+> (7 Canvas files were HTTP 404 / deleted upstream; any still-in-progress
+> course is best excluded and re-run once its term ends — see `HDD_SETUP.md`
+> → Scope.) Details in `HDD_SETUP.md` → Run history; ghost list in
+> `_ghost_sessions.md`.
 
 ## Read first: this was built for one specific setup
 

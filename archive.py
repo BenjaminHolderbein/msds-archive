@@ -215,10 +215,12 @@ def run_phase_a(surface: str, manifests_dir: Path, course_ids: list[int]) -> int
 
 
 def run_phase_b(manifest_path: Path, podcast_dir: Path, *, mode: str,
-                workers: int) -> int:
+                workers: int, max_mbps: float | None = None) -> int:
     cmd = [sys.executable, str(PHASE_B),
            str(manifest_path), str(podcast_dir),
            '--mode', mode, '--workers', str(workers)]
+    if max_mbps:
+        cmd += ['--max-mbps', str(max_mbps)]
     print(f'\nphase B ----  {manifest_path.name} → {podcast_dir}  (mode={mode})',
           flush=True)
     return subprocess.call(cmd)
@@ -471,6 +473,10 @@ def main() -> None:
     ap.add_argument('--podcast-only', action='store_true',
                     help='deprecated; equivalent to --mode podcast')
     ap.add_argument('--workers', type=int, default=4)
+    ap.add_argument('--max-mbps', type=float, default=None,
+                    help='cap Phase B download bandwidth (megabits/sec total '
+                         'across workers) so the network stays usable; '
+                         'default: unlimited')
     ap.add_argument('--min-free-gb', type=int, default=50)
     ap.add_argument('--verify-only', action='store_true',
                     help='just run the verifier; do not fetch anything')
@@ -543,7 +549,8 @@ def main() -> None:
                      f'Phase B: {i+1}/{len(eligible)} {c["name"][:50]}')
             mode = 'podcast' if args.podcast_only else args.mode
             run_phase_b(mp, out_root / slug / 'panopto',
-                        mode=mode, workers=args.workers)
+                        mode=mode, workers=args.workers,
+                        max_mbps=args.max_mbps)
         progress(0.95, 'Phase B done')
 
     # Phase C — Canvas mirror. phase_c.py already writes to

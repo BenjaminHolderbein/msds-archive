@@ -291,3 +291,15 @@ the same command.** Idempotency is the whole point.
   `screen.mp4`. Final: 376 `combined.mp4` + 13 audio-only sessions, verified
   389/389 present. Note: do NOT mux deletion candidates first (wasted work) —
   exclude them via `/tmp/ghost_dirs.txt`.
+- **2026-07-15 — MSDS 631 added (term ended), archive now complete.** Ran
+  `archive.py --course-ids 1633557 --max-mbps 200` (new bandwidth-cap flag so
+  the network stayed usable). 19 sessions / 37.4 h downloaded (19/19 mp4s +
+  captions, 26 Canvas files + 14 submissions); ghost check removed 2
+  empty-room recordings (kept 1 weak-mic borderline) → **17 lectures,
+  ~26 GB**; `combine_av.sh` muxed all 17. Full-archive verify: **20 courses,
+  406 sessions, ~570 GB**; only residue remains the 7 upstream-404 Canvas
+  files from the first run. Bandwidth-cap gotcha discovered: ffmpeg's
+  `-readrate` over-throttles Panopto HLS (~1.5x realtime regardless of the
+  requested multiple), and unthrottled HLS blows past any cap — so
+  `download.py` now fetches the variant's single byterange `fragmented.mp4`
+  with `curl --limit-rate` and remuxes locally.
